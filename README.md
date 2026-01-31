@@ -17,12 +17,18 @@ A modern, fully responsive personal portfolio website designed to showcase AI/ML
 ## 📁 Project Structure
 
 ```
-Portfolio/
-├── index.html          # Main HTML file
-├── styles.css          # All styling and responsive design
-├── script.js           # Interactive functionality
-├── README.md           # This file
-└── images/            # Project and profile images (to be added)
+Rushi_Portfolio/
+├── assets/
+│   └── images/        # All images and resume PDF
+├── css/
+│   └── styles.css     # All styling and responsive design
+├── js/
+│   └── script.js      # Interactive functionality
+├── index.html         # Main HTML file
+├── vercel.json        # Vercel deployment configuration
+├── .gitignore         # Git ignore file
+├── .env.example       # Environment variables template
+└── README.md          # This file
 ```
 
 ## 🚀 Quick Start
@@ -220,6 +226,62 @@ If you need help customizing this portfolio:
 
 ## 🚀 Deployment
 
+### Vercel (Recommended - Free)
+
+This project is optimized for Vercel deployment with proper configuration already in place.
+
+#### Prerequisites
+- GitHub account
+- Vercel account (sign up at [vercel.com](https://vercel.com))
+
+#### Step-by-Step Deployment
+
+1. **Push to GitHub**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/yourusername/your-repo.git
+   git push -u origin main
+   ```
+
+2. **Connect to Vercel**
+   - Go to [vercel.com](https://vercel.com) and sign in
+   - Click "Add New Project"
+   - Import your GitHub repository
+   - Vercel will auto-detect the configuration from `vercel.json`
+
+3. **Configure Environment Variables**
+   - In Vercel project settings, go to "Environment Variables"
+   - Add the following variables:
+     - `VITE_SUPABASE_URL` = Your Supabase project URL
+     - `VITE_SUPABASE_ANON_KEY` = Your Supabase anon key
+   - These values can be found in your Supabase project settings
+
+4. **Deploy**
+   - Click "Deploy"
+   - Your site will be live at `https://your-project.vercel.app`
+   - Every push to main branch will auto-deploy
+
+#### Local Development with Environment Variables
+
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Fill in your actual Supabase credentials in `.env`
+
+3. Open `index.html` in your browser or use a local server:
+   ```bash
+   # Using Python
+   python -m http.server 8000
+   
+   # Using Node.js
+   npx serve
+   ```
+
 ### GitHub Pages (Free)
 
 1. Create a GitHub repository
@@ -228,17 +290,21 @@ If you need help customizing this portfolio:
 4. Select main branch as source
 5. Your site will be live at `https://yourusername.github.io/repository-name`
 
+**Note:** For GitHub Pages, you'll need to hardcode Supabase credentials or use a different approach for environment variables.
+
 ### Netlify (Free)
 
-1. Sign up at netlify.com
+1. Sign up at [netlify.com](https://netlify.com)
 2. Drag and drop your project folder
-3. Your site is live instantly with a custom URL
+3. Add environment variables in Site Settings → Build & Deploy → Environment
+4. Your site is live instantly with a custom URL
 
-### Vercel (Free)
+## 🔒 Security Notes
 
-1. Sign up at vercel.com
-2. Import your GitHub repository
-3. Deploy with one click
+- Never commit `.env` file to version control (already in `.gitignore`)
+- Use environment variables for all sensitive data in production
+- Supabase anon key is safe to expose in frontend, but use Row Level Security (RLS) policies
+- For production, consider implementing rate limiting on your Supabase project
 
 ---
 

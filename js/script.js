@@ -171,6 +171,8 @@ filterButtons.forEach(button => {
 // ===================================
 // SUPABASE CONFIGURATION
 // ===================================
+// For static sites, we need to hardcode the credentials
+// In production, you can use Vercel's environment variables with a build step
 const supabaseUrl = 'https://zmoqbbbexruzfqvrvytc.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptb3FiYmJleHJ1emZxdnJ2eXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NjQxMjQsImV4cCI6MjA4NTM0MDEyNH0.IyHdoarhuD_1Ntsoz826yaV4k2YBoMHcpv5G2HXc7WA';
 
@@ -229,8 +231,14 @@ if (contactForm) {
 
             console.log('✅ Form successfully submitted:', data);
 
-            // Show success message
-            alert('Thank you for your message! I will get back to you soon.');
+            // Show success message with SweetAlert2
+            Swal.fire({
+                icon: 'success',
+                title: 'Message Sent!',
+                text: 'Thank you for your message! I will get back to you soon.',
+                confirmButtonColor: '#6366f1',
+                confirmButtonText: 'Great!'
+            });
 
             // Reset form
             contactForm.reset();
@@ -240,15 +248,41 @@ if (contactForm) {
 
             // Specific help for different error types
             if (error.message.includes('Failed to fetch') || error.message.includes('ERR_NAME_NOT_RESOLVED')) {
-                alert('❌ Connection Error: Could not connect to Supabase.\n\nPossible causes:\n1. Check if the Supabase Project URL is correct\n2. Verify your internet connection\n3. Check browser console for details');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Connection Error',
+                    html: 'Could not connect to Supabase.<br><br><strong>Possible causes:</strong><br>1. Check if the Supabase Project URL is correct<br>2. Verify your internet connection<br>3. Check browser console for details',
+                    confirmButtonColor: '#6366f1'
+                });
             } else if (error.message.includes('JWT') || error.message.includes('apikey')) {
-                alert('❌ Authentication Error: Invalid API key.\n\nPlease verify your Supabase anon key in the dashboard.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Authentication Error',
+                    text: 'Invalid API key. Please verify your Supabase anon key in the dashboard.',
+                    confirmButtonColor: '#6366f1'
+                });
             } else if (error.message.includes('permission') || error.message.includes('policy')) {
-                alert('❌ Permission Error: Row Level Security is blocking the insert.\n\nPlease enable public insert policy on the ContactMe table.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Permission Error',
+                    text: 'Row Level Security is blocking the insert. Please enable public insert policy on the ContactMe table.',
+                    confirmButtonColor: '#6366f1'
+                });
             } else if (error.message.includes('relation') || error.message.includes('does not exist')) {
-                alert('❌ Table Error: The "ContactMe" table does not exist.\n\nPlease create it in your Supabase dashboard.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Table Error',
+                    text: 'The "ContactMe" table does not exist. Please create it in your Supabase dashboard.',
+                    confirmButtonColor: '#6366f1'
+                });
             } else {
-                alert(`❌ Error: ${error.message}\n\nCheck the browser console for more details.`);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Submission Failed',
+                    text: error.message,
+                    footer: 'Check the browser console for more details',
+                    confirmButtonColor: '#6366f1'
+                });
             }
         } finally {
             // Reset button state
@@ -267,14 +301,21 @@ if (downloadResumeBtn) {
     downloadResumeBtn.addEventListener('click', (e) => {
         e.preventDefault();
 
-        // In a real scenario, this would download your actual resume
-        alert('Resume download would start here. Please add your resume PDF to the project and update this link.');
+        // Use window.location to get the correct base path
+        const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+        const pdfPath = baseUrl + '/assets/images/CV_Jainish_J_Patel.pdf';
 
-        // Example of how to trigger a download:
+        // Create a temporary link element to trigger download
         const link = document.createElement('a');
-        link.href = 'CV_Jainish_J_Patel.pdf';
-        link.download = 'CV_Jainish_J_Patel.pdf';
+        link.href = pdfPath;
+        link.download = 'Jainish_Patel_Resume.pdf';
+
+        // Trigger the download
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+
+        console.log('Resume download initiated from:', pdfPath);
     });
 }
 
