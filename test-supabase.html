@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Connection Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #3ecf8e;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #3ecf8e;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #2fb574;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔧 Supabase Connection Tester</h1>
+
+        <div class="info">
+            <strong>📋 How to get your credentials:</strong><br>
+            1. Go to <a href="https://supabase.com/dashboard" target="_blank">Supabase Dashboard</a><br>
+            2. Select your project<br>
+            3. Go to <strong>Settings → API</strong><br>
+            4. Copy the <strong>Project URL</strong> and <strong>anon/public key</strong>
+        </div>
+
+        <div class="input-group">
+            <label for="url">Supabase Project URL:</label>
+            <input type="text" id="url" placeholder="https://xxxxx.supabase.co"
+                value="https://zmoqbbbexruzfqvrvytc.supabase.co">
+        </div>
+
+        <div class="input-group">
+            <label for="key">Supabase Anon Key:</label>
+            <input type="text" id="key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+        </div>
+
+        <div class="input-group">
+            <label for="table">Table Name:</label>
+            <input type="text" id="table" placeholder="ContactMe" value="ContactMe">
+        </div>
+
+        <button onclick="testConnection()">🚀 Test Connection</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            const url = document.getElementById('url').value.trim();
+            const key = document.getElementById('key').value.trim();
+            const table = document.getElementById('table').value.trim();
+
+            resultDiv.style.display = 'block';
+            resultDiv.className = '';
+            resultDiv.innerHTML = '⏳ Testing connection...';
+
+            try {
+                console.log('Testing with:', { url, keyLength: key.length, table });
+
+                // Create Supabase client
+                const supabase = window.supabase.createClient(url, key);
+
+                // Test data
+                const testData = {
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    subject: 'Connection Test',
+                    message: 'This is a test message from the connection tester.'
+                };
+
+                console.log('Attempting insert:', testData);
+
+                // Try to insert
+                const { data, error } = await supabase
+                    .from(table)
+                    .insert([testData]);
+
+                if (error) {
+                    console.error('Supabase Error:', error);
+                    resultDiv.className = 'error';
+                    resultDiv.innerHTML = `
+                        <strong>❌ Connection Failed</strong><br><br>
+                        <strong>Error:</strong> ${error.message}<br>
+                        <strong>Details:</strong> ${error.details || 'N/A'}<br>
+                        <strong>Hint:</strong> ${error.hint || 'N/A'}<br>
+                        <strong>Code:</strong> ${error.code || 'N/A'}<br><br>
+                        <pre>${JSON.stringify(error, null, 2)}</pre>
+                    `;
+                } else {
+                    console.log('Success!', data);
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ Connection Successful!</strong><br><br>
+                        Data was successfully inserted into the <strong>${table}</strong> table.<br>
+                        Check your Supabase dashboard to verify the entry.<br><br>
+                        <strong>Response:</strong><br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (err) {
+                console.error('Caught error:', err);
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <strong>❌ Unexpected Error</strong><br><br>
+                    <strong>Message:</strong> ${err.message}<br><br>
+                    <strong>Common Causes:</strong><br>
+                    • Invalid API key format<br>
+                    • Incorrect Project URL<br>
+                    • Network/CORS issues<br>
+                    • Table doesn't exist<br><br>
+                    <pre>${err.stack}</pre>
+                `;
+            }
+        }
+    </script>
+</body>
+
+</html>
